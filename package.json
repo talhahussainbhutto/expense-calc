@@ -1,0 +1,45 @@
+{
+  "name": "project_name",
+  "version": "1.0.0",
+  "description": "A TypeScript GraphQL microservice for _________",
+  "main": "build/server.js",
+  "repository": "git@github.com:brandverse/project_name.git",
+  "author": "Zak Mandhro",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "npx tsc",
+    "dev": "NODE_ENV=development npx ts-node-dev src/server",
+    "start": "node build/server",
+    "test": "npx jest -i",
+    "clear": "rm logs/*",
+    "test-watch": "npx jest --watch",
+    "deploy": "NODE_ENV=alpha docker-compose up --detach --build",
+    "deploy-alpha": "yarn build && NODE_ENV=alpha docker-compose up --detach --build",
+    "deploy-production": "yarn build && NODE_ENV=production docker-compose up --detach --build"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^8.0.0",
+    "@types/graphql": "^14.2.3",
+    "@types/jest": "^24.0.15",
+    "@types/lodash": "^4.14.136",
+    "@types/node": "^12.6.8",
+    "@types/uuid": "^3.4.5",
+    "graphql-tag": "^2.10.1",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "ts-node-dev": "^1.0.0-pre.40",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "apollo-server": "^2.7.1",
+    "axios": "^0.19.0",
+    "chalk": "^2.4.2",
+    "fs-extra": "^8.1.0",
+    "graphql": "^14.4.2",
+    "graphql-request": "^1.8.2",
+    "lodash": "^4.17.15",
+    "uuid": "^3.3.2",
+    "winston": "^3.2.1",
+    "xml-js": "^1.6.11"
+  }
+}
