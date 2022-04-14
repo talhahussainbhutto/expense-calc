@@ -1,26 +1,37 @@
 import { gql } from "apollo-server"
 
 export default gql`
-  type Ping {
-    name: String
-    location: String
-    version: String
-    uptime: Float
+  enum EntryTypes {
+    expense
+    income
+    asset
+  }
+  type Entry {
+    title: String
+    date_added: String
+    bvid: String!
+    amount: Float
+    entryType: EntryTypes
+    date_lastEdit: String
   }
 
-  type LogEvent {
-    message: String
-    level: String
-    service: String
-    timestamp: String
+  type TotalResult {
+    total: Float
+  }
+
+  type BVID {
+    bvid: String
   }
 
   type Query {
-    ping: Ping
-    logs: [LogEvent]
+    allEntries: [Entry]
+    entryBasedOnType(entryType: String): [Entry]
+    totalOfAType(entryType: String): TotalResult
+    total: TotalResult
   }
-
-  schema {
-    query: Query
+  type Mutation {
+    addEntry(entryType: String, title: String, amount: Float): Entry
+    updateEntry(uid: ID, title: String, amount: Float): Entry
+    deleteEntry(bvid: String): BVID
   }
 `
