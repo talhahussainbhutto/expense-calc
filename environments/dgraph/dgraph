@@ -1,0 +1,100 @@
+#!/bin/bash
+
+REQUIRED_DGRAPH_VERSION="v20.11.3"
+
+dgraph_version=`dgraph version | grep "Dgraph version" | sed 's/.* \(.*\)/\1/'`
+command="$1"
+environment="$2"
+
+function title {
+    echo -ne "\033]0;"$*"\007"
+}
+
+if [ "$dgraph_version" != "$REQUIRED_DGRAPH_VERSION" ]; then
+  echo "Unsupported version $dgraph_version. Please get Dgraph $REQUIRED_DGRAPH_VERSION"
+  exit 1
+fi
+
+echo -e "\nUsing dgraph version $dgraph_version installed at `which dgraph` "
+
+if [ "$environment" == "" ]; then
+  dir="$(dirname $PWD)"
+  environment="$(basename $dir)"
+fi
+
+if [ "$command" == "" ]; then
+  echo -e "\nUsage:\n  dgraph command [environment name]\n\n"
+  echo -e "Commands:"
+  echo -e "  start   start dgraph as a background service"
+  echo -e "  zero    start dgraph zero only for import"
+  echo -e "  rerun   clears and then runs dgraph zero server"
+  echo -e "  run     run dgraph alpha in foreground"
+  echo -e "  stop    stop all local dgraph services"
+  echo -e "  clear   clear dgraph log and data files"
+  echo -e "  clear!  clear dgraph log and data files without prompting"
+  echo -e "\nExample: dgraph start development"
+  exit 1
+fi
+
+if [ -e alpha.config.json -a -e zero.config.json ]; then
+  echo -e "Using alpha.config.json and zero.config.json in local path"
+else
+  echo -e "\nError: Missing config files alpha.config.json and zero.config.json in:\n"`pwd`
+  exit 1
+fi
+
+# Set the terminal title to environment so it's easier to identify in tabs
+title $environment
+
+if [ "$command" == "start" ]; then
+  echo "Starting Dgraph for $environment"
+  # This script runs the dgraph alpha in background
+  dgraph zero --config zero.config.json > zero.log &
+  dgraph alpha --config alpha.config.json > alpha.log &
+  exit 0
+fi
+
+if [ "$command" == "zero" ]; then
+  echo "Starting Dgraph in $environment for import (zero only)"
+  # This script runs the dgraph alpha in background
+  dgraph zero --config zero.config.json > zero.log
+  exit 0
+fi
+
+if [ "$command" == "clear" ]; then
+  read -p "Clearing Dgraph data. Are you sure? (y/N) " -n 1 -r
+  echo    # (optional) move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    rm -rf .tmp/*
+    rm *.log
+    echo Done!
+  fi
+fi
+
+if [ "$command" == "clear!" ]; then
+  rm -rf .tmp/*
+  rm *.log
+  echo Done!
+fi
+
+if [ "$command" == "stop" ]; then
+  echo "Stopping all local Dgraph services"
+  killall dgraph
+  exit 0
+fi
+
+
+if [ "$command" == "run" ]; then
+  echo "Running Dgraph for $environment"
+  dgraph zero --config zero.config.json > zero.log &
+  dgraph alpha --config alpha.config.json > alpha.log
+fi
+
+if [ "$command" == "rerun" ]; then
+  echo "Clearing and running Dgraph for $environment"
+  rm -rf .tmp/*
+  rm *.log
+  dgraph zero --config zero.config.json > zero.log &
+  dgraph alpha --config alpha.config.json > alpha.log
+fi

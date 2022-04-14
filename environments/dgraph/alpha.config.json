@@ -1,0 +1,7 @@
+{
+  "zero": "localhost:5130",
+  "port_offset": 50,
+  "lru_mb": 2048,
+  "postings": "./.tmp/p",
+  "wal": "./.tmp/w"
+}

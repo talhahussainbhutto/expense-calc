@@ -1,0 +1,4 @@
+{
+  "port_offset": 50,
+  "wal": "./.tmp/zw"
+}
